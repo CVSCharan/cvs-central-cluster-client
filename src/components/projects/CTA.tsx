@@ -7,9 +7,9 @@ const CTASection = () => {
     <section className="relative py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-accent/5 z-0"></div>
-      
+
       <div className="container relative z-10 mx-auto max-w-7xl">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -21,19 +21,19 @@ const CTASection = () => {
               Have a project in mind?
             </h2>
             <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
-              I'm always open to discussing new projects and opportunities.
+              {`I'm always open to discussing new projects and opportunities.`}
             </p>
           </div>
           <Link
             href="/contact"
             className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all hover:scale-105 mt-2 sm:mt-4"
           >
-            Let's Talk
+            {`Let's Talk`}
             <ChevronRight size={16} className="ml-1" />
           </Link>
         </motion.div>
       </div>
-      
+
       {/* Decorative elements */}
       <div className="absolute bottom-0 left-1/4 h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-primary/10 blur-xl sm:blur-2xl opacity-70 sm:opacity-100"></div>
       <div className="absolute top-1/3 right-1/4 h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-accent/10 blur-xl sm:blur-2xl opacity-70 sm:opacity-100"></div>

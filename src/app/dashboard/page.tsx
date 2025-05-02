@@ -4,7 +4,14 @@ import React from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import NavBar from "@/components/layout/navbar";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -12,7 +19,6 @@ import {
   Users,
   FileText,
   MessageSquare,
-  TrendingUp,
   ArrowUpRight,
   ArrowDownRight,
   Eye,
@@ -156,7 +162,7 @@ const DashboardPage = () => {
               Welcome to your Dashboard
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base">
-              Here's what's happening with your projects today.
+              {`Here's what's happening with your projects today.`}
             </p>
           </motion.div>
 
@@ -188,11 +194,15 @@ const DashboardPage = () => {
                       <ArrowDownRight className="h-3 w-3 text-red-500 mr-1" />
                     )}
                     <span
-                      className={`${stat.trend === "up" ? "text-green-500" : "text-red-500"}`}
+                      className={`${
+                        stat.trend === "up" ? "text-green-500" : "text-red-500"
+                      }`}
                     >
                       {stat.change}
                     </span>
-                    <span className="text-muted-foreground ml-1">vs last month</span>
+                    <span className="text-muted-foreground ml-1">
+                      vs last month
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -213,7 +223,9 @@ const DashboardPage = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <CardTitle>Recent Projects</CardTitle>
-                      <CardDescription>Your latest project activity</CardDescription>
+                      <CardDescription>
+                        Your latest project activity
+                      </CardDescription>
                     </div>
                     <Button asChild variant="ghost" size="sm" className="gap-1">
                       <Link href="/dashboard/projects">
@@ -262,7 +274,12 @@ const DashboardPage = () => {
                   </div>
                 </CardContent>
                 <CardFooter className="border-t p-4">
-                  <Button asChild variant="outline" size="sm" className="w-full gap-1">
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-1"
+                  >
                     <Link href="/dashboard/projects/new">
                       <Plus className="h-3.5 w-3.5" />
                       Add New Project
@@ -283,7 +300,9 @@ const DashboardPage = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <CardTitle>Recent Activity</CardTitle>
-                      <CardDescription>Latest actions from your team</CardDescription>
+                      <CardDescription>
+                        Latest actions from your team
+                      </CardDescription>
                     </div>
                     <Button variant="ghost" size="icon">
                       <Bell className="h-4 w-4" />
@@ -298,12 +317,19 @@ const DashboardPage = () => {
                         className="flex items-start gap-3 p-4 hover:bg-muted/50 transition-colors"
                       >
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={activity.user.avatar} alt={activity.user.name} />
-                          <AvatarFallback>{activity.user.initials}</AvatarFallback>
+                          <AvatarImage
+                            src={activity.user.avatar}
+                            alt={activity.user.name}
+                          />
+                          <AvatarFallback>
+                            {activity.user.initials}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 space-y-1">
                           <p className="text-sm">
-                            <span className="font-medium">{activity.user.name}</span>{" "}
+                            <span className="font-medium">
+                              {activity.user.name}
+                            </span>{" "}
                             {activity.action}{" "}
                             <Link
                               href="#"
@@ -312,7 +338,9 @@ const DashboardPage = () => {
                               {activity.target}
                             </Link>
                           </p>
-                          <p className="text-xs text-muted-foreground">{activity.time}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {activity.time}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -331,7 +359,9 @@ const DashboardPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Frequently used actions and shortcuts</CardDescription>
+                <CardDescription>
+                  Frequently used actions and shortcuts
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -401,7 +431,9 @@ const DashboardPage = () => {
                 <div className="flex justify-between items-center">
                   <div>
                     <CardTitle>Performance Overview</CardTitle>
-                    <CardDescription>Monthly traffic and engagement metrics</CardDescription>
+                    <CardDescription>
+                      Monthly traffic and engagement metrics
+                    </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm">
@@ -418,8 +450,12 @@ const DashboardPage = () => {
                   <div className="text-center space-y-3">
                     <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground" />
                     <div>
-                      <p className="text-muted-foreground">Chart visualization will appear here</p>
-                      <p className="text-xs text-muted-foreground">Connect your analytics to see real data</p>
+                      <p className="text-muted-foreground">
+                        Chart visualization will appear here
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Connect your analytics to see real data
+                      </p>
                     </div>
                     <Button variant="outline" size="sm">
                       Connect Analytics

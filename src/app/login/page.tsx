@@ -304,7 +304,7 @@ const LoginPage = () => {
 
             <div className="mt-6 text-center text-sm">
               <span className="text-muted-foreground">
-                Don't have an account?{" "}
+                {`Don't have an account?`}{" "}
               </span>
               <Link href="/register" className="text-primary hover:underline">
                 Sign up
