@@ -1,0 +1,330 @@
+"use client";
+
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import NavBar from "@/components/layout/navbar";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { projects } from "@/data/projects";
+import { Project } from "@/types/projects";
+import {
+  FolderPlus,
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  Eye,
+  ExternalLink,
+  Github,
+  Plus,
+  ArrowUpDown,
+  XCircle,
+} from "lucide-react";
+
+const DashboardProjectsPage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [sortBy, setSortBy] = useState<{ field: keyof Project; direction: 'asc' | 'desc' }>({ 
+    field: "title", 
+    direction: "asc" 
+  });
+
+  // Filter projects based on search term and category
+  const filteredProjects = projects
+    .filter((project) => {
+      const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesCategory = categoryFilter === "all" || project.category === categoryFilter;
+      
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      const fieldA = a[sortBy.field as keyof typeof a];
+      const fieldB = b[sortBy.field as keyof typeof b];
+      
+      if (typeof fieldA === 'string' && typeof fieldB === 'string') {
+        return sortBy.direction === 'asc' 
+          ? fieldA.localeCompare(fieldB) 
+          : fieldB.localeCompare(fieldA);
+      }
+      
+      return 0;
+    });
+
+  const handleSort = (field: keyof Project) => {
+    setSortBy(prev => ({
+      field,
+      direction: prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  const categories = [
+    { name: "All", value: "all" },
+    { name: "Web", value: "web" },
+    { name: "Mobile", value: "mobile" },
+    { name: "Design", value: "design" },
+  ];
+
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <NavBar />
+
+      <main className="flex-1 relative">
+        {/* Background gradient effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 z-0 pointer-events-none"></div>
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+          {/* Header Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold tracking-tight mb-2">
+                  Projects
+                </h1>
+                <p className="text-muted-foreground text-sm sm:text-base">
+                  Manage and organize your portfolio projects
+                </p>
+              </div>
+              <Button asChild className="rounded-full gap-2">
+                <Link href="/dashboard/projects/new">
+                  <Plus className="h-4 w-4" />
+                  Add New Project
+                </Link>
+              </Button>
+            </div>
+
+            {/* Filters and Search */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search projects..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              </div>
+
+              {/* Category Filter */}
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none"
+                >
+                  {categories.map((category) => (
+                    <option key={category.value} value={category.value}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Stats */}
+              <div className="lg:flex items-center justify-end gap-6 hidden">
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-bold">{projects.length}</span>
+                  <span className="text-xs text-muted-foreground">Total Projects</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-bold">{filteredProjects.length}</span>
+                  <span className="text-xs text-muted-foreground">Filtered Results</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Projects Table */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>Project List</CardTitle>
+                    <CardDescription>
+                      {filteredProjects.length} projects found
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-muted/50 border-b">
+                      <tr>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                          <button 
+                            className="flex items-center gap-1 hover:text-foreground transition-colors"
+                            onClick={() => handleSort('title')}
+                          >
+                            Title
+                            <ArrowUpDown className="h-3 w-3" />
+                          </button>
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground hidden md:table-cell">
+                          <button 
+                            className="flex items-center gap-1 hover:text-foreground transition-colors"
+                            onClick={() => handleSort('category')}
+                          >
+                            Category
+                            <ArrowUpDown className="h-3 w-3" />
+                          </button>
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground hidden lg:table-cell">
+                          Technologies
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground hidden sm:table-cell">
+                          Links
+                        </th>
+                        <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {filteredProjects.length > 0 ? (
+                        filteredProjects.map((project) => (
+                          <tr key={project.id} className="hover:bg-muted/50 transition-colors">
+                            <td className="py-3 px-4">
+                              <div className="flex items-start gap-3">
+                                <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center text-muted-foreground">
+                                  <FolderPlus className="h-5 w-5" />
+                                </div>
+                                <div>
+                                  <div className="font-medium">{project.title}</div>
+                                  <div className="text-xs text-muted-foreground line-clamp-1">
+                                    {project.description}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3 px-4 hidden md:table-cell">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                                {project.category}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 hidden lg:table-cell">
+                              <div className="flex flex-wrap gap-1">
+                                {project.technologies.slice(0, 3).map((tech, index) => (
+                                  <span
+                                    key={index}
+                                    className="inline-block px-2 py-1 text-xs rounded-full bg-accent/10 text-accent-foreground"
+                                  >
+                                    {tech}
+                                  </span>
+                                ))}
+                                {project.technologies.length > 3 && (
+                                  <span className="inline-block px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground">
+                                    +{project.technologies.length - 3}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-3 px-4 hidden sm:table-cell">
+                              <div className="flex items-center gap-2">
+                                {project.liveUrl && (
+                                  <a
+                                    href={project.liveUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="p-1 rounded-md hover:bg-accent/50 transition-colors"
+                                    title="Live Demo"
+                                  >
+                                    <ExternalLink className="h-4 w-4" />
+                                  </a>
+                                )}
+                                {project.githubUrl && (
+                                  <a
+                                    href={project.githubUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="p-1 rounded-md hover:bg-accent/50 transition-colors"
+                                    title="GitHub Repository"
+                                  >
+                                    <Github className="h-4 w-4" />
+                                  </a>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  asChild
+                                >
+                                  <Link href={`/dashboard/projects/${project.id}`}>
+                                    <Eye className="h-4 w-4" />
+                                  </Link>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  asChild
+                                >
+                                  <Link href={`/dashboard/projects/${project.id}/edit`}>
+                                    <Edit className="h-4 w-4" />
+                                  </Link>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-destructive hover:text-destructive/80 hover:bg-destructive/10"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-10 text-center text-muted-foreground">
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <XCircle className="h-8 w-8" />
+                              <p>No projects found</p>
+                              <p className="text-xs">Try adjusting your search or filters</p>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+              <CardFooter className="border-t p-4 flex justify-between items-center">
+                <div className="text-sm text-muted-foreground">
+                  Showing {filteredProjects.length} of {projects.length} projects
+                </div>
+                <Button asChild variant="outline" size="sm" className="gap-1">
+                  <Link href="/dashboard/projects/new">
+                    <Plus className="h-3.5 w-3.5" />
+                    Add Project
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          </motion.div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default DashboardProjectsPage;
