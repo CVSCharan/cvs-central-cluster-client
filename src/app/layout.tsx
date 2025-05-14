@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Montserrat, Lora } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { TestimonialsProvider } from "@/contexts/TestimonialsContext";
-import { AuthProvider } from "@/contexts/AuthContext";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -30,11 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${montserrat.variable} ${lora.variable} antialiased`}>
-        <ThemeProvider defaultTheme="system">
-          <TestimonialsProvider>
-            <AuthProvider>{children}</AuthProvider>
-          </TestimonialsProvider>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

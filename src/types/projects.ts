@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface Category {
   name: string;
   value: string;
@@ -36,4 +38,52 @@ export interface ProjectFormData {
   liveUrl: string;
   githubUrl: string;
   category: string;
+}
+
+export interface FilteredProjectsSectionProps {
+  categories: Category[];
+  setFilter: (value: string) => void;
+  filter: string;
+  filteredProjects: Project[];
+  currentPage: number;
+  totalPages: number;
+  loadMoreFeaturedProjects: () => Promise<void>;
+  loadingMore: boolean;
+}
+
+export interface ProjectFormData {
+  id: string;
+  title: string;
+  description: string;
+  fullDescription: string;
+  image: string;
+  technologies: string[];
+  features: string[];
+  liveUrl: string;
+  githubUrl: string;
+  category: string;
+}
+
+export interface ProjectsProviderProps {
+  children: ReactNode;
+}
+
+export interface ProjectsContextType {
+  apiUrl: string;
+  // For testimonials page (paginated)
+  projects: Project[];
+  loading: boolean;
+  loadingMore: boolean;
+  error: string | null;
+  currentPage: number;
+  totalPages: number;
+  pageLimit: number;
+  currentProject: Project | null;
+  loadingProject: boolean;
+  projectError: string | null;
+
+  // Methods
+  fetchActiveProjects: (page: number, limit: number) => Promise<void>;
+  loadMoreActiveProjects: () => Promise<void>;
+  fetchProjectById: (id: string) => Promise<void>;
 }

@@ -11,11 +11,10 @@ const HeroSection = () => {
           className="max-w-3xl mx-auto text-center"
         >
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold tracking-tight mb-4">
-            Featured Projects
+            What Our Users Say
           </h1>
           <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto">
-            A featured collection of my work, showcasing my skills and expertise
-            in web development.
+            Authentic Feedback from Real Users.
           </p>
         </motion.div>
       </div>

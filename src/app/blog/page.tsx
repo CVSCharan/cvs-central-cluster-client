@@ -91,7 +91,7 @@ const BlogPage: React.FC = () => {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <main className="flex min-h-screen flex-col bg-background">
       <Header />
 
       {/* Hero Section */}
@@ -109,7 +109,7 @@ const BlogPage: React.FC = () => {
       <NewsletterSection />
 
       <Footer />
-    </div>
+    </main>
   );
 };
 

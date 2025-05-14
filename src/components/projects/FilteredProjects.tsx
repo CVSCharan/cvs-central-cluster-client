@@ -1,16 +1,21 @@
 import { FilteredProjectsSectionProps } from "@/types/projects";
 import { ExternalLink, Github } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const FilteredProjectsSection = ({
   categories,
   setFilter,
   filter,
   filteredProjects,
+  loadingMore,
+  currentPage,
+  totalPages,
+  loadMoreFeaturedProjects,
 }: FilteredProjectsSectionProps) => {
   return (
-    <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
-      <div className="container mx-auto max-w-7xl">
+    <section className="pb-16 px-4 md:px-6">
+      <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -33,61 +38,94 @@ const FilteredProjectsSection = ({
         </motion.div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {filteredProjects.map((project, index) => (
             <motion.div
-              key={project.id}
+              key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="border rounded-xl overflow-hidden group hover:shadow-md transition-all duration-300 hover:translate-y-[-5px] bg-card"
+              className="border rounded-xl overflow-hidden group hover:shadow-lg transition-shadow"
             >
               <div className="aspect-video bg-muted relative">
-                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                  Project Image
-                </div>
+                {project.image ? (
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    fill
+                    className="object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+                    Project Image
+                  </div>
+                )}
               </div>
-              <div className="p-5 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-serif font-semibold mb-2 group-hover:text-primary transition-colors">
-                  {project.title}
-                </h3>
-                <p className="text-sm sm:text-base text-muted-foreground mb-4">
-                  {project.description}
-                </p>
+              <div className="p-6">
                 <div className="flex flex-wrap gap-2 mb-4">
                   {project.technologies.map((tech, index) => (
                     <span
                       key={index}
-                      className="inline-block px-2 py-1 text-xs rounded-full bg-accent/10 text-accent-foreground"
+                      className="inline-block px-3 py-1 text-xs rounded-full bg-primary/10 text-primary"
                     >
                       {tech}
                     </span>
                   ))}
                 </div>
+                <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                  {project.title}
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  {project.description}
+                </p>
                 <div className="flex space-x-4 mt-4">
                   <a
                     href={project.demoUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
+                    className="inline-flex items-center text-primary font-medium hover:underline transition-colors"
                   >
                     Live Demo
-                    <ExternalLink size={14} className="ml-1" />
+                    <ExternalLink size={16} className="ml-1" />
                   </a>
                   <a
                     href={project.codeUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
+                    className="inline-flex items-center text-primary font-medium hover:underline transition-colors"
                   >
                     Code
-                    <Github size={14} className="ml-1" />
+                    <Github size={16} className="ml-1" />
                   </a>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
+
+        {filteredProjects.length > 0 && (
+          <>
+            {currentPage < totalPages && (
+              <div className="flex justify-center mt-10">
+                <button
+                  onClick={() => loadMoreFeaturedProjects()}
+                  disabled={loadingMore}
+                  className="px-8 py-3 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium transition-all duration-200 flex items-center space-x-2 disabled:opacity-70 cursor-pointer"
+                >
+                  {loadingMore ? (
+                    <>
+                      <span className="animate-spin h-5 w-5 border-t-2 border-b-2 border-white rounded-full mr-2"></span>
+                      <span>Loading...</span>
+                    </>
+                  ) : (
+                    <span>Load More</span>
+                  )}
+                </button>
+              </div>
+            )}
+          </>
+        )}
 
         {filteredProjects.length === 0 && (
           <motion.div

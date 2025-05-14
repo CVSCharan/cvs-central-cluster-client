@@ -22,7 +22,7 @@ const SearchAndFiltersSection = ({
   }>;
 }) => {
   return (
-    <section className="py-8 px-4 md:px-6">
+    <section className="pb-16 px-4 md:px-6">
       <div className="container mx-auto">
         <div className="max-w-2xl mx-auto mb-12">
           <div className="relative">
