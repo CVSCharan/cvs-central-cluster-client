@@ -4,13 +4,6 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import NavBar from "@/components/layout/navbar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -22,9 +15,11 @@ import {
   Shield,
   ShieldAlert,
   ShieldCheck,
-  ArrowUpDown,
   CheckCircle2,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
 } from "lucide-react";
 import { useUsersStore } from "@/store/UsersStore";
 import { User } from "@/types/users";
@@ -56,7 +51,7 @@ const DashboardUsersPage = () => {
   // Fetch users on component mount
   useEffect(() => {
     fetchUsers(1, 10); // Fetch first page with 10 users per page
-  }, []);
+  }, [fetchUsers]);
 
   // Filter users based on search term and role
   const filteredUsers = users
@@ -83,14 +78,6 @@ const DashboardUsersPage = () => {
 
       return 0;
     });
-
-  const handleSort = (field: string) => {
-    setSortBy((prev) => ({
-      field,
-      direction:
-        prev.field === field && prev.direction === "asc" ? "desc" : "asc",
-    }));
-  };
 
   const roles = [
     { name: "All Roles", value: "all" },
@@ -119,7 +106,7 @@ const DashboardUsersPage = () => {
     }
   };
 
-  // Determine status based on isAdmin
+  // Since we don't have status in the User interface, we'll determine it based on isAdmin
   const getUserStatus = (user: User) => {
     return user.isAdmin ? "Active" : "Viewer";
   };
@@ -145,25 +132,79 @@ const DashboardUsersPage = () => {
     }
   };
 
+  // Calculate page numbers to display for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      // If we have 5 or fewer pages, show all
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always include first page
+      pages.push(1);
+
+      // Calculate start and end of middle pages
+      let startPage = Math.max(2, currentPage - 1);
+      let endPage = Math.min(totalPages - 1, currentPage + 1);
+
+      // Adjust if we're near the beginning
+      if (currentPage <= 3) {
+        endPage = 4;
+      }
+
+      // Adjust if we're near the end
+      if (currentPage >= totalPages - 2) {
+        startPage = totalPages - 3;
+      }
+
+      // Add ellipsis after first page if needed
+      if (startPage > 2) {
+        pages.push(-1); // -1 represents ellipsis
+      }
+
+      // Add middle pages
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      // Add ellipsis before last page if needed
+      if (endPage < totalPages - 1) {
+        pages.push(-2); // -2 represents ellipsis
+      }
+
+      // Always include last page
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
+
+  // Function to handle page change
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    fetchUsers(page);
+  };
+
   return (
     <RequireAuth>
       <div className="flex min-h-screen flex-col bg-background">
         <NavBar />
 
         <main className="flex-1 relative">
-          {/* Subtle background pattern for professional look */}
-          <div
-            className="absolute inset-0 opacity-5 pointer-events-none"
-            style={{
-              backgroundImage:
-                "url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')",
-              backgroundSize: "60px 60px",
-            }}
-          ></div>
+          {/* Background gradient effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 z-0 pointer-events-none"></div>
 
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-            {/* Header Section with refined typography */}
-            <div className="mb-8">
+            {/* Header Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-8"
+            >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold tracking-tight mb-2">
@@ -173,10 +214,7 @@ const DashboardUsersPage = () => {
                     Manage user accounts and permissions
                   </p>
                 </div>
-                <Button
-                  asChild
-                  className="rounded-md gap-2 bg-primary hover:bg-primary/90 text-white shadow-sm"
-                >
+                <Button asChild className="rounded-full gap-2">
                   <Link href="/dashboard/users/new">
                     <UserPlus className="h-4 w-4" />
                     New User
@@ -184,9 +222,9 @@ const DashboardUsersPage = () => {
                 </Button>
               </div>
 
-              {/* Filters and Search with refined styling */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                {/* Search with improved styling */}
+              {/* Filters and Search */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                {/* Search */}
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
@@ -194,17 +232,17 @@ const DashboardUsersPage = () => {
                     placeholder="Search users..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+                    className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   />
                 </div>
 
-                {/* Role Filter with improved styling */}
+                {/* Role Filter */}
                 <div className="relative">
                   <Shield className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <select
                     value={roleFilter}
                     onChange={(e) => setRoleFilter(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary appearance-none"
+                    className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none"
                   >
                     {roles.map((role) => (
                       <option key={role.value} value={role.value}>
@@ -214,18 +252,16 @@ const DashboardUsersPage = () => {
                   </select>
                 </div>
 
-                {/* Stats with refined styling */}
-                <div className="flex items-center justify-end gap-6 col-span-2">
+                {/* Stats */}
+                <div className="lg:flex items-center justify-end gap-6 hidden">
                   <div className="flex flex-col items-center">
-                    <span className="text-2xl font-bold text-primary">
-                      {users.length}
-                    </span>
+                    <span className="text-2xl font-bold">{users.length}</span>
                     <span className="text-xs text-muted-foreground">
                       Total Users
                     </span>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="text-2xl font-bold text-primary">
+                    <span className="text-2xl font-bold">
                       {filteredUsers.length}
                     </span>
                     <span className="text-xs text-muted-foreground">
@@ -234,23 +270,15 @@ const DashboardUsersPage = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Users Table with professional styling */}
-            <Card className="border-0 shadow-md rounded-lg overflow-hidden">
-              <CardHeader className="pb-3 bg-muted/30 border-b">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle className="text-xl font-serif">
-                      User List
-                    </CardTitle>
-                    <CardDescription>
-                      {filteredUsers.length} users found
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
+            {/* Users Cards */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <div className="space-y-8">
                 {loading ? (
                   <div className="flex justify-center items-center py-12">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -269,154 +297,178 @@ const DashboardUsersPage = () => {
                       Try Again
                     </Button>
                   </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-muted/50 border-b">
-                        <tr>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                            <button
-                              className="flex items-center gap-1 hover:text-foreground transition-colors"
-                              onClick={() => handleSort("name")}
-                            >
-                              User
-                              <ArrowUpDown className="h-3 w-3" />
-                            </button>
-                          </th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground hidden md:table-cell">
-                            <button
-                              className="flex items-center gap-1 hover:text-foreground transition-colors"
-                              onClick={() => handleSort("role")}
-                            >
-                              Role
-                              <ArrowUpDown className="h-3 w-3" />
-                            </button>
-                          </th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground hidden lg:table-cell">
-                            <button
-                              className="flex items-center gap-1 hover:text-foreground transition-colors"
-                              onClick={() => handleSort("isAdmin")}
-                            >
-                              Status
-                              <ArrowUpDown className="h-3 w-3" />
-                            </button>
-                          </th>
-                          <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {filteredUsers.length > 0 ? (
-                          filteredUsers.map((user, index) => (
-                            <tr
-                              key={index}
-                              className="hover:bg-muted/30 transition-colors"
-                            >
-                              <td className="py-3 px-4">
-                                <div className="flex items-center gap-3">
-                                  <Avatar className="h-9 w-9 border border-muted shadow-sm">
-                                    <AvatarImage
-                                      src={user.picture}
-                                      alt={user.name}
-                                    />
-                                    <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                                      {getInitials(user.name)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <div className="font-medium">
-                                      {user.name}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground">
-                                      {user.email}
-                                    </div>
+                ) : filteredUsers.length > 0 ? (
+                  <>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                      {filteredUsers.map((user, index) => (
+                        <motion.div
+                          key={user.id || index}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: index * 0.1 }}
+                          className="border rounded-xl overflow-hidden group hover:shadow-lg transition-shadow bg-card"
+                        >
+                          <div className="p-6">
+                            <div className="flex items-start gap-4">
+                              <Avatar className="h-12 w-12 border-2 border-primary/10">
+                                <AvatarImage
+                                  src={user.picture}
+                                  alt={user.name}
+                                />
+                                <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                                  {getInitials(user.name)}
+                                </AvatarFallback>
+                              </Avatar>
+
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
+                                    {user.name}
+                                  </h3>
+                                  <div className="flex items-center gap-1.5">
+                                    {getRoleIcon(user.role)}
+                                    <span className="text-sm text-muted-foreground">
+                                      {user.role}
+                                    </span>
                                   </div>
                                 </div>
-                              </td>
-                              <td className="py-3 px-4 hidden md:table-cell">
-                                <div className="flex items-center gap-1.5">
-                                  {getRoleIcon(user.role)}
-                                  <span className="font-medium text-sm">
-                                    {user.role}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="py-3 px-4 hidden lg:table-cell">
-                                {getStatusBadge(user)}
-                              </td>
-                              <td className="py-3 px-4 text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-md hover:bg-primary/10 hover:text-primary"
-                                    asChild
-                                  >
-                                    <Link href={`/dashboard/users/${user.id}`}>
-                                      <Eye className="h-4 w-4" />
-                                    </Link>
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-md hover:bg-primary/10 hover:text-primary"
-                                    asChild
-                                  >
-                                    <Link
-                                      href={`/dashboard/users/${user.id}/edit`}
+
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {user.email}
+                                </p>
+
+                                <div className="flex items-center justify-between mt-4">
+                                  <div>{getStatusBadge(user)}</div>
+
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 text-primary hover:text-primary/80 hover:bg-primary/10"
+                                      asChild
                                     >
-                                      <Edit className="h-4 w-4" />
-                                    </Link>
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-md text-destructive hover:text-destructive hover:bg-destructive/10"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
+                                      <Link
+                                        href={`/dashboard/users/${user.id}`}
+                                      >
+                                        <Eye className="h-4 w-4" />
+                                      </Link>
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 text-primary hover:text-primary/80 hover:bg-primary/10"
+                                      asChild
+                                    >
+                                      <Link
+                                        href={`/dashboard/users/${user.id}/edit`}
+                                      >
+                                        <Edit className="h-4 w-4" />
+                                      </Link>
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 text-destructive hover:text-destructive/80 hover:bg-destructive/10"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
                                 </div>
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td
-                              colSpan={4}
-                              className="py-12 text-center text-muted-foreground"
-                            >
-                              No users found. Try adjusting your search
-                              criteria.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </CardContent>
-              {totalPages > 1 && (
-                <div className="flex justify-center p-4 border-t">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={loadMoreUsers}
-                    disabled={loadingMore || currentPage >= totalPages}
-                    className="gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30"
-                  >
-                    {loadingMore ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      <>Load More Users</>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-between border-t pt-6 mt-8">
+                        <div className="text-sm text-muted-foreground font-medium">
+                          Page {currentPage} of {totalPages}
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1 || loadingMore}
+                            className="border-muted hover:bg-muted/80 cursor-pointer"
+                          >
+                            <ChevronLeft className="h-4 w-4 mr-1" />
+                          </Button>
+
+                          <div className="hidden md:flex space-x-1">
+                            {getPageNumbers().map((page, index) => (
+                              <React.Fragment key={index}>
+                                {page < 0 ? (
+                                  <span className="px-2 flex items-center text-muted-foreground">
+                                    ...
+                                  </span>
+                                ) : (
+                                  <Button
+                                    variant={
+                                      page === currentPage
+                                        ? "default"
+                                        : "outline"
+                                    }
+                                    size="sm"
+                                    onClick={() => handlePageChange(page)}
+                                    disabled={loadingMore}
+                                    className={`min-w-[2.5rem] ${
+                                      page === currentPage
+                                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                        : "border-muted hover:bg-muted/80"
+                                    }`}
+                                  >
+                                    {page}
+                                  </Button>
+                                )}
+                              </React.Fragment>
+                            ))}
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages || loadingMore}
+                            className="border-muted hover:bg-muted/80 cursor-pointer"
+                          >
+                            <ChevronRight className="h-4 w-4 ml-1" />
+                          </Button>
+                        </div>
+                      </div>
                     )}
-                  </Button>
-                </div>
-              )}
-            </Card>
+
+                    {loadingMore && (
+                      <div className="flex justify-center py-4">
+                        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4 }}
+                    className="text-center py-12 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/20"
+                  >
+                    <div className="flex flex-col items-center justify-center gap-4 max-w-md mx-auto">
+                      <AlertCircle className="h-10 w-10 text-muted-foreground" />
+                      <h3 className="text-xl font-medium text-foreground">
+                        No users found
+                      </h3>
+                      <p className="text-muted-foreground">
+                        We couldn't find any users matching your criteria. Try
+                        adjusting your search filters or add a new user.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
           </div>
         </main>
       </div>

@@ -10,7 +10,7 @@ interface ProjectsState {
   projectsCurrentPage: number;
   projectsTotalPages: number;
   projectsPageLimit: number;
-  
+
   // State for active projects
   activeProjects: Project[];
   activeProjectsLoading: boolean;
@@ -19,7 +19,7 @@ interface ProjectsState {
   activeProjectsCurrentPage: number;
   activeProjectsTotalPages: number;
   activeProjectsPageLimit: number;
-  
+
   // State for featured projects
   featuredProjects: Project[];
   featuredProjectsLoading: boolean;
@@ -28,7 +28,7 @@ interface ProjectsState {
   featuredProjectsCurrentPage: number;
   featuredProjectsTotalPages: number;
   featuredProjectsPageLimit: number;
-  
+
   // Shared state
   currentProject: Project | null;
   loadingProject: boolean;
@@ -54,7 +54,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
   projectsCurrentPage: 1,
   projectsTotalPages: 1,
   projectsPageLimit: 6,
-  
+
   // State for active projects
   activeProjects: [],
   activeProjectsLoading: false,
@@ -63,7 +63,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
   activeProjectsCurrentPage: 1,
   activeProjectsTotalPages: 1,
   activeProjectsPageLimit: 4,
-  
+
   // State for featured projects
   featuredProjects: [],
   featuredProjectsLoading: false,
@@ -72,7 +72,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
   featuredProjectsCurrentPage: 1,
   featuredProjectsTotalPages: 1,
   featuredProjectsPageLimit: 4,
-  
+
   // Shared state
   currentProject: null,
   loadingProject: false,
@@ -81,10 +81,10 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
   // Actions
   fetchProjects: async (page = 1, limit = 6) => {
-    set({ 
-      projectsLoading: true, 
-      projectsError: null, 
-      projectsPageLimit: limit 
+    set({
+      projectsLoading: true,
+      projectsError: null,
+      projectsPageLimit: limit,
     });
 
     try {
@@ -121,11 +121,11 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
   },
 
   loadMoreProjects: async () => {
-    const { 
-      projectsCurrentPage, 
-      projectsTotalPages, 
-      projectsPageLimit, 
-      projects 
+    const {
+      projectsCurrentPage,
+      projectsTotalPages,
+      projectsPageLimit,
+      projects,
     } = get();
 
     if (projectsCurrentPage >= projectsTotalPages) return;
@@ -166,10 +166,10 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
   },
 
   fetchActiveProjects: async (page = 1, limit = 4) => {
-    set({ 
-      activeProjectsLoading: true, 
-      activeProjectsError: null, 
-      activeProjectsPageLimit: limit 
+    set({
+      activeProjectsLoading: true,
+      activeProjectsError: null,
+      activeProjectsPageLimit: limit,
     });
 
     try {
@@ -198,7 +198,8 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     } catch (err) {
       console.error("Error fetching active projects:", err);
       set({
-        activeProjectsError: "Failed to load active projects. Please try again later.",
+        activeProjectsError:
+          "Failed to load active projects. Please try again later.",
         activeProjects: [],
         activeProjectsLoading: false,
       });
@@ -206,11 +207,11 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
   },
 
   loadMoreActiveProjects: async () => {
-    const { 
-      activeProjectsCurrentPage, 
-      activeProjectsTotalPages, 
-      activeProjectsPageLimit, 
-      activeProjects 
+    const {
+      activeProjectsCurrentPage,
+      activeProjectsTotalPages,
+      activeProjectsPageLimit,
+      activeProjects,
     } = get();
 
     if (activeProjectsCurrentPage >= activeProjectsTotalPages) return;
@@ -219,7 +220,9 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     try {
       const nextPage = activeProjectsCurrentPage + 1;
       const response = await fetch(
-        `${get().apiUrl}/projects/active?page=${nextPage}&limit=${activeProjectsPageLimit}`
+        `${
+          get().apiUrl
+        }/projects/active?page=${nextPage}&limit=${activeProjectsPageLimit}`
       );
 
       if (!response.ok) {
@@ -244,17 +247,18 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     } catch (err) {
       console.error("Error fetching more active projects:", err);
       set({
-        activeProjectsError: "Failed to load more active projects. Please try again.",
+        activeProjectsError:
+          "Failed to load more active projects. Please try again.",
         activeProjectsLoadingMore: false,
       });
     }
   },
 
   fetchFeaturedProjects: async (page = 1, limit = 4) => {
-    set({ 
-      featuredProjectsLoading: true, 
-      featuredProjectsError: null, 
-      featuredProjectsPageLimit: limit 
+    set({
+      featuredProjectsLoading: true,
+      featuredProjectsError: null,
+      featuredProjectsPageLimit: limit,
     });
 
     try {
@@ -283,7 +287,8 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     } catch (err) {
       console.error("Error fetching featured projects:", err);
       set({
-        featuredProjectsError: "Failed to load featured projects. Please try again later.",
+        featuredProjectsError:
+          "Failed to load featured projects. Please try again later.",
         featuredProjects: [],
         featuredProjectsLoading: false,
       });
@@ -291,11 +296,11 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
   },
 
   loadMoreFeaturedProjects: async () => {
-    const { 
-      featuredProjectsCurrentPage, 
-      featuredProjectsTotalPages, 
-      featuredProjectsPageLimit, 
-      featuredProjects 
+    const {
+      featuredProjectsCurrentPage,
+      featuredProjectsTotalPages,
+      featuredProjectsPageLimit,
+      featuredProjects,
     } = get();
 
     if (featuredProjectsCurrentPage >= featuredProjectsTotalPages) return;
@@ -304,7 +309,9 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     try {
       const nextPage = featuredProjectsCurrentPage + 1;
       const response = await fetch(
-        `${get().apiUrl}/projects/featured?page=${nextPage}&limit=${featuredProjectsPageLimit}`
+        `${
+          get().apiUrl
+        }/projects/featured?page=${nextPage}&limit=${featuredProjectsPageLimit}`
       );
 
       if (!response.ok) {
@@ -329,7 +336,8 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     } catch (err) {
       console.error("Error fetching more featured projects:", err);
       set({
-        featuredProjectsError: "Failed to load more featured projects. Please try again.",
+        featuredProjectsError:
+          "Failed to load more featured projects. Please try again.",
         featuredProjectsLoadingMore: false,
       });
     }

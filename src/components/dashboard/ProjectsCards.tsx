@@ -134,8 +134,8 @@ const ProjectsCards = ({ projects, filteredProjects }: ProjectsTableProps) => {
                           disabled={projectsLoadingMore}
                           className={`min-w-[2.5rem] ${
                             page === projectsCurrentPage
-                              ? "bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
-                              : "border-muted hover:bg-muted/80 cursor-pointer"
+                              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                              : "border-muted hover:bg-muted/80"
                           }`}
                         >
                           {page}

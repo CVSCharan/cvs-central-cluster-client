@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { Testimonial } from '@/types/testimonials';
+import { create } from "zustand";
+import { Testimonial } from "@/types/testimonials";
 
 interface TestimonialsState {
   // State
@@ -14,7 +14,7 @@ interface TestimonialsState {
   recentLoading: boolean;
   recentError: string | null;
   apiUrl: string;
-  
+
   // Actions
   fetchTestimonials: (page?: number, limit?: number) => Promise<void>;
   loadMoreTestimonials: () => Promise<void>;
@@ -34,7 +34,7 @@ export const useTestimonialsStore = create<TestimonialsState>((set, get) => ({
   recentLoading: false,
   recentError: null,
   apiUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api",
-  
+
   // Actions
   fetchTestimonials: async (page = 1, limit = 4) => {
     set({ loading: true, error: null, pageLimit: limit });
@@ -60,28 +60,30 @@ export const useTestimonialsStore = create<TestimonialsState>((set, get) => ({
         testimonials: testimonialsList,
         totalPages: data.totalPages || 1,
         currentPage: page,
-        loading: false
+        loading: false,
       });
     } catch (err) {
       console.error("Error fetching testimonials:", err);
       set({
         error: "Failed to load testimonials. Please try again later.",
         testimonials: [],
-        loading: false
+        loading: false,
       });
     }
   },
-  
+
   loadMoreTestimonials: async () => {
     const { currentPage, totalPages, pageLimit, testimonials } = get();
-    
+
     if (currentPage >= totalPages) return;
 
     set({ loadingMore: true });
     try {
       const nextPage = currentPage + 1;
       const response = await fetch(
-        `${get().apiUrl}/testimonials/approved?page=${nextPage}&limit=${pageLimit}`
+        `${
+          get().apiUrl
+        }/testimonials/approved?page=${nextPage}&limit=${pageLimit}`
       );
 
       if (!response.ok) {
@@ -101,17 +103,17 @@ export const useTestimonialsStore = create<TestimonialsState>((set, get) => ({
       set({
         testimonials: [...testimonials, ...newTestimonials],
         currentPage: nextPage,
-        loadingMore: false
+        loadingMore: false,
       });
     } catch (err) {
       console.error("Error fetching more testimonials:", err);
       set({
         error: "Failed to load more testimonials. Please try again.",
-        loadingMore: false
+        loadingMore: false,
       });
     }
   },
-  
+
   fetchRecentTestimonials: async (limit = 3) => {
     set({ recentLoading: true, recentError: null });
 
@@ -134,15 +136,15 @@ export const useTestimonialsStore = create<TestimonialsState>((set, get) => ({
 
       set({
         recentTestimonials: recentList,
-        recentLoading: false
+        recentLoading: false,
       });
     } catch (err) {
       console.error("Error fetching recent testimonials:", err);
       set({
         recentError: "Failed to load recent testimonials.",
         recentTestimonials: [],
-        recentLoading: false
+        recentLoading: false,
       });
     }
-  }
+  },
 }));
