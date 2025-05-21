@@ -17,10 +17,12 @@ import {
   Bell,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useAuthStore } from "@/store/AuthStore";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuthStore();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -110,8 +112,8 @@ const NavBar = () => {
               AC
             </div>
             <div className="hidden lg:block">
-              <p className="text-sm font-medium">Admin User</p>
-              <p className="text-xs text-muted-foreground">admin@example.com</p>
+              <p className="text-sm font-medium">{user?.name}</p>
+              <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
           </div>
 
@@ -155,8 +157,8 @@ const NavBar = () => {
               AC
             </div>
             <div>
-              <p className="font-medium">Admin User</p>
-              <p className="text-xs text-muted-foreground">admin@example.com</p>
+              <p className="font-medium">{user?.name}</p>
+              <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
           </div>
 

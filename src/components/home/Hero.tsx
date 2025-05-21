@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section className="relative flex items-center justify-center min-h-[80vh] overflow-hidden py-16 sm:py-20 md:py-24 lg:py-32 bg-background">
+    <section className="relative flex items-center justify-center min-h-screen overflow-hidden py-16 sm:py-20 md:py-24 lg:py-32 bg-background">
       {/* Background gradient effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 z-0"></div>
 

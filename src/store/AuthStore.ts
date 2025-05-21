@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { User } from '@/types/users';
-import { LoginProps } from '@/types/auth';
-import Cookies from 'js-cookie';
+import { create } from "zustand";
+import { User } from "@/types/users";
+import { LoginProps } from "@/types/auth";
+import Cookies from "js-cookie";
 
 interface AuthState {
   // State
@@ -11,9 +11,9 @@ interface AuthState {
   isAuthenticated: boolean;
   error: string | null;
   apiUrl: string;
-  
+
   // Actions
-  login: (credentials: LoginProps) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   register: (userData: any) => Promise<void>;
   logout: () => void;
   fetchUserProfile: (authToken: string) => Promise<void>;
@@ -28,9 +28,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   error: null,
   apiUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
-  
+
   // Actions
-  login: async (credentials: LoginProps) => {
+  login: async (email: string, password: string) => {
     set({ isLoading: true, error: null });
     try {
       const response = await fetch(`${get().apiUrl}/auth/login`, {
@@ -38,7 +38,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({ email, password }),
         credentials: "include",
       });
 
@@ -55,14 +55,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
 
       // Set user data in cookie
-      Cookies.set(
-        "cvs_central_cluster_user_data",
-        JSON.stringify(data.user),
-        {
-          expires: 1, // 1 day
-          sameSite: "Strict",
-        }
-      );
+      Cookies.set("cvs_central_cluster_user_data", JSON.stringify(data.user), {
+        expires: 1, // 1 day
+        sameSite: "Strict",
+      });
 
       set({
         token: data.token,
@@ -78,7 +74,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
     }
   },
-  
+
   register: async (userData: any) => {
     set({ isLoading: true, error: null });
     try {
@@ -107,12 +103,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       throw err;
     }
   },
-  
+
   logout: () => {
     // Remove cookies
     Cookies.remove("cvs_central_cluster_user_token");
     Cookies.remove("cvs_central_cluster_user_data");
-    
+
     // Reset state
     set({
       user: null,
@@ -120,7 +116,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       isAuthenticated: false,
     });
   },
-  
+
   fetchUserProfile: async (authToken: string) => {
     try {
       const response = await fetch(`${get().apiUrl}/auth/me`, {
@@ -153,12 +149,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       throw err;
     }
   },
-  
+
   clearError: () => set({ error: null }),
 }));
 
 // Initialize auth state on app load
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   const storedToken = Cookies.get("cvs_central_cluster_user_token");
   const storedUserData = Cookies.get("cvs_central_cluster_user_data");
 
@@ -167,7 +163,9 @@ if (typeof window !== 'undefined') {
 
     // If we have a token but no user data, fetch the user profile
     if (!storedUserData) {
-      useAuthStore.getState().fetchUserProfile(storedToken)
+      useAuthStore
+        .getState()
+        .fetchUserProfile(storedToken)
         .then(() => {
           useAuthStore.setState({ isAuthenticated: true, isLoading: false });
         })
@@ -180,18 +178,21 @@ if (typeof window !== 'undefined') {
       // If we have both token and user data, set them
       try {
         const userData = JSON.parse(storedUserData);
-        useAuthStore.setState({ 
-          user: userData, 
-          isAuthenticated: true, 
-          isLoading: false 
+        useAuthStore.setState({
+          user: userData,
+          isAuthenticated: true,
+          isLoading: false,
         });
       } catch (e) {
         console.error("Error parsing stored user data:", e);
         // If user data is corrupted, fetch it again
-        useAuthStore.getState().fetchUserProfile(storedToken).catch(() => {
-          Cookies.remove("cvs_central_cluster_user_token");
-          Cookies.remove("cvs_central_cluster_user_data");
-        });
+        useAuthStore
+          .getState()
+          .fetchUserProfile(storedToken)
+          .catch(() => {
+            Cookies.remove("cvs_central_cluster_user_token");
+            Cookies.remove("cvs_central_cluster_user_data");
+          });
         useAuthStore.setState({ isLoading: false });
       }
     }

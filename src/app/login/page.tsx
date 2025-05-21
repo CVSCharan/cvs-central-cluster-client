@@ -5,11 +5,11 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
+import { useAuthStore } from "@/store/AuthStore";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -21,7 +21,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   // Get auth context
-  const { login, error: authError, isLoading: authLoading } = useAuth();
+  const { login, error: authError, isLoading: authLoading } = useAuthStore();
   // Update component state when auth context changes
   useEffect(() => {
     if (authError) {

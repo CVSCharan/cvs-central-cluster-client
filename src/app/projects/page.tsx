@@ -15,12 +15,12 @@ const ProjectsPage: React.FC = () => {
   const limit = 4; // Number of testimonials per page
 
   const {
-    projects,
+    featuredProjects,
     fetchFeaturedProjects,
-    currentPage,
-    totalPages,
+    featuredProjectsCurrentPage,
+    featuredProjectsTotalPages,
     loadMoreFeaturedProjects,
-    loadingMore,
+    featuredProjectsLoadingMore,
   } = useProjectsStore();
 
   // Simulate loading state for smoother transitions
@@ -31,8 +31,8 @@ const ProjectsPage: React.FC = () => {
 
   const filteredProjects =
     filter === "all"
-      ? projects
-      : projects.filter((project) => project.category.includes(filter));
+      ? featuredProjects
+      : featuredProjects.filter((project) => project.category.includes(filter));
 
   const categories = [
     { name: "All", value: "all" },
@@ -72,10 +72,10 @@ const ProjectsPage: React.FC = () => {
               setFilter={setFilter}
               filter={filter}
               filteredProjects={filteredProjects}
-              currentPage={currentPage}
-              totalPages={totalPages}
+              currentPage={featuredProjectsCurrentPage}
+              totalPages={featuredProjectsTotalPages}
               loadMoreFeaturedProjects={loadMoreFeaturedProjects}
-              loadingMore={loadingMore}
+              loadingMore={featuredProjectsLoadingMore}
             />
 
             {/* CTA Section */}

@@ -6,8 +6,8 @@ import { motion } from "framer-motion";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CheckCircle, XCircle } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
 import Cookies from "js-cookie";
+import { useAuthStore } from "@/store/AuthStore";
 
 // Client component that safely uses useSearchParams
 const AuthSuccessContent: React.FC = () => {
@@ -16,7 +16,7 @@ const AuthSuccessContent: React.FC = () => {
   const [countdown, setCountdown] = useState(3);
   const [redirectInitiated, setRedirectInitiated] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { fetchUserProfile, setIsAuthenticated } = useAuth();
+  const { fetchUserProfile } = useAuthStore();
 
   // Use useCallback to memoize the redirect function
   const handleRedirect = useCallback(() => {
@@ -73,7 +73,7 @@ const AuthSuccessContent: React.FC = () => {
         fetchUserProfile(token)
           .then(() => {
             // Set authenticated state
-            setIsAuthenticated(true);
+            // setIsAuthenticated(true);
             // Start countdown after successful authentication
             timer = startCountdown();
           })
